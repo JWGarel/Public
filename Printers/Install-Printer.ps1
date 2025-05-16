@@ -87,7 +87,7 @@ catch { Write-Log "Critical error checking if printer was already installed: $($
 #region --={ Install the printer }=--
 try {
     Write-Log "Adding printer '$PrinterPath' to the system."
-    $PrinterName = Split-Path -Path $PrinterPath -Leaf
+    $PrinterName = ($PrinterPath -split '\\')[-1] # Split-Path does not work with UNC paths reliably, so we do this.
     $RunDLL32 = Join-Path $env:windir 'System32\Rundll32.exe'
     $PrinterInstallPath = "printui.dll,PrintUIEntry /ga /b `"$PrinterName`" /n `"$PrinterPath`" /u /q"
     Write-Log "RunDLL32 Arguments: $PrinterInstallPath"
