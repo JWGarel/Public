@@ -33,6 +33,8 @@ Scripts for listing and removing printers:
 - **Printers-IPListAll.ps1**: Lists all per-machine IP printers.
 - **Printers-NetworkDeleteAll.ps1**: Deletes all per-machine named network printers.
 - **Printers-NetworkListAll.ps1**: Lists all per-machine named network printers.
+- **Install-Printer.ps1**: Installs a per-machine printer with PrintUI
+- **Uninstall-Printer.ps1**: Uninstalls a per-machine printer with PrintUI
 
 ### Tools/
 
