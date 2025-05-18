@@ -1,3 +1,7 @@
+### These are scripts made for strange conditions; such as when you can't use Group Policy or you need to use an ancient version of Altiris to deploy software or printers.
+
+They're designed to run unattended, and generally do not rely on anything that doesn't come from Microsoft to operate.
+
 ### Applications/
 
 Scripts for installing, updating, and uninstalling software using WinGet and other methods.
@@ -22,7 +26,7 @@ Reusable PowerShell modules providing core functions:
 
 - **AppHandling.psm1**: Functions for program detection, installation, updating, and removal.
 - **Push-RegK.psm1**: Functions for registry key management and path creation/removal.
-- **UserRegistry.psm1**: Functions for enumerating and modifying user registry hives.
+- **UserRegistry.psm1**: Functions for enumerating and modifying user registry hives. (mostly untested)
 - **Write-Log.psm1**: Centralized logging function for all scripts.
 
 ### Printers/
@@ -59,7 +63,7 @@ Most scripts use the [`Write-Log`](Include/Write-Log.psm1) module to record acti
 ## Requirements
 
 - Windows 10/11
-- PowerShell v3.0 or later
+- PowerShell v3.0 or later (tested on 5.1)
 - Administrative privileges for most scripts
 
 ## Authors
@@ -68,4 +72,4 @@ Scripts and modules by Jason W. Garel.
 
 ---
 
-For details on each script/module, see the inline documentation at the top of each file.
+For more details on each script/module, see the inline documentation at the top of each file.
