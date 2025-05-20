@@ -1,6 +1,6 @@
-### These are scripts made for strange conditions; such as when you can't use Group Policy or you need to use an ancient version of Altiris to deploy software or printers.
+### These are scripts made for strange conditions; such as when you can't use Group Policy or you need to use an ancient version of Altiris to deploy software or printers to a lot of computers at once.
 
-They're designed to run unattended, and generally do not rely on anything that doesn't come from Microsoft to operate.
+They're designed to run unattended, locally, and generally do not rely on anything that doesn't come from Microsoft to operate. Works in PowerShell 3.0+ 
 
 ### Applications/
 
@@ -62,7 +62,7 @@ Most scripts use the [`Write-Log`](Include/Write-Log.psm1) module to record acti
 
 ## Requirements
 
-- Windows 10/11
+- Tested on Windows 10 and 11. Theoretically these will work with earlier systems as well.
 - PowerShell v3.0 or later (tested on 5.1)
 - Administrative privileges for most scripts
 
