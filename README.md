@@ -25,6 +25,7 @@ Scripts for managing Google Drive installation and user data.
 Reusable PowerShell modules providing core functions:
 
 - **AppHandling.psm1**: Functions for program detection, installation, updating, and removal.
+- **PrinterHandling.psm1**: Functions for handling install, polling, and removal of printers.
 - **Push-RegK.psm1**: Functions for registry key management and path creation/removal.
 - **UserRegistry.psm1**: Functions for enumerating and modifying user registry hives. (mostly untested)
 - **Write-Log.psm1**: Centralized logging function for all scripts.
@@ -47,8 +48,11 @@ General troubleshooting and utility scripts:
 - **Check-Domain.ps1**: Checks if the PC is joined to a domain.
 - **Check-Integrity.bat / Check-Integrity.ps1**: Runs DISM and SFC for system integrity checks and cleanup.
 - **IPConfigRE.bat**: Resets network settings (DHCP, DNS, ARP, Winsock).
+- **Push-RegKey.ps1**: Call to push a registry key
+- **Remove-Profiles.ps1**: Call to backup and remove local AD profile folders, accepts a few switches.
 - **Restart-Polite.ps1**: Restarts the computer with user notification and delay.
 - **Set-TimeServer.ps1**: Changes and resyncs the system time server.
+- **WiFi-Amnesia.ps1**: Forget all WiFi networks.
 
 ## Logging
 
@@ -56,8 +60,8 @@ Most scripts use the [`Write-Log`](Include/Write-Log.psm1) module to record acti
 
 ## Usage
 
-- Run scripts as Administrator for full functionality.
-- Modify parameters at the top of each script as needed for your environment.
+- Run specified scripts as Administrator
+- Pass data or modify parameters at the top of each script as needed for your environment.
 - Use the modules in `Include/` for custom scripting or extending functionality.
 
 ## Requirements
