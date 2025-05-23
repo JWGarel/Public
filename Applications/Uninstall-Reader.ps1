@@ -1,10 +1,8 @@
 ﻿#powershell
 # Uninstall Only Adobe Reader (Not Pro)
-#Requires -RunAsAdministrator
 <# 
 .SYNOPSIS
     Uninstall Only Adobe Reader (Not Pro)
-
 .DESCRIPTION
     There once was a script, so sharp and so keen, to uninstall Reader, a task so routine!
     It sought through the list (Where packages exist) For "Adobe Acrobat" to be seen.
@@ -16,21 +14,24 @@
     So Reader would flee,
         While Pro stayed carefree,
             A selective uninstaller, indeed!
-
 .NOTES
-    Author: Jason W. Garel
-    Version: 1.0
-    Creation Date: 03-14-25
+    Author:   Jason W. Garel
+    Version:  1.0.4
+    Created:  03-14-25
+    Modified: 05-05-25
+    Change Log:
+        05-05-25 - JWG - Cleaned up formatting.
+        04-29-25 - JWG - Switched from old Log-Message to new Write-Log script. Added more try/catch loops and errorlevel returns.
+    Requires: PowerShell v3.0 or later
     Permissions: Admin rights
     Dependencies: Write-Log.psm1
-
-.OUTPUT
+.OUTPUTS
     Returns 0 for lack of critical errors, 1 for critical failure.
 #>
 
 $LogFile = "C:\Temp\Logs\AdobeReader-Uninstall.log"                            # Path to log file
 $SCAKey = "HKLM:\SOFTWARE\Adobe\Adobe Acrobat\DC\Installer"                    # Current SCA key location 4-29-25
-Import-Module "..\Include\Write-Log.psm1"   # Allow logging via Write-Log function
+Import-Module "..\Include\Write-Log.psm1"     # Allow logging via Write-Log function
 
 Write-Host "Log file: $LogFile" # This is to make PSSA stop complaining about the $LogFile not being set
 Write-Log  "--=( Adobe Reader Uninstall Script started )=--" "Start!"

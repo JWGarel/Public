@@ -1,10 +1,10 @@
 #powershell
 # Background integrity repair and cleanup
 #Requires -RunAsAdministrator
+#Requires -Version 3.0
 <# 
 .SYNOPSIS
     Background integrity repair and cleanup
-
 .DESCRIPTION
     Based on the batch file of the same name, which only worked in Windows 10 and made ugly log files,
     This script performs a background integrity check and cleanup of the system.
@@ -13,22 +13,29 @@
     When it logs, it leaves out the progress percentage, which is not useful in a log file.
     This is designed to be deployed, run as a scheduled task, or run in person, so it does not require user interaction.
     Tested and works on Windows 10 and Windows 11.    
-
 .NOTES
-    Author: Jason W. Garel
-    Version: 2.0
-    Creation Date: 01-23-25
+    Author:    Jason W. Garel
+    Version:   2.0.1
+    Created :  01-23-25
+    Modified : 05-20-25
+    Change Log:
+        05-20-25 - JWG - Changed out final return 0 for EXIT 0 to prevent Altiris issues.
+        05-15-25 - JWG - Changed from batch file to PowerShell script. Added logging and error handling.
+                           Now compatible with Windows 11 as well as 10.
     Requires: Write-Log.psm1, AppHandling.psm1, Push-RegK.psm1
-    Requires: Admin rights
+.OUTPUTS
+    Logs are saved in $LogFile along with additional, more verbose logs in C:\Windows\Logs\DISM and C:\Windows\Logs\CBS
+.FUNCTIONALITY
+    This script is unattended; Designed to be deployed, run as a scheduled task or run from the command line.
 #>
-Import-Module "..\Include\Write-Log.psm1"   # Allow logging via Write-Log function
+Import-Module "..\Include\Write-Log.psm1"  # Allow logging via Write-Log function
 Import-Module "..\Include\AppHandling.psm1" # Allow fancy app handling functions
-Import-Module "..\Include\Push-RegK.psm1"   # Allow fancy registry and directory handling functions
+Import-Module "..\Include\Push-RegK.psm1"  # Allow fancy registry and directory handling functions
 
 $LogFile = "C:\Temp\Logs\Check-Integrity.log"
-Write-Host "Log file: $LogFile" # This is to make VBSC stop complaining about the $LogFile not being set
 
 Write-Log "--=( Starting Integrity Check and Cleanup )=--" "Start!"
+Write-Host "Log file: $LogFile" # This is to make VBSC stop complaining about the $LogFile not being set
 
 #region --=( Integrity Check )=--
 try {
@@ -88,4 +95,4 @@ catch { Write-Log "Failed to start all Windows Update services: $($_.Exception.M
 #endregion --=( Cleanup )=--
 
 Write-Log "--=( Integrity Check and Cleanup complete )=--" "End!"
-return 0
+EXIT 0
