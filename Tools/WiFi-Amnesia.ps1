@@ -11,11 +11,9 @@
     Intended for unattended use in automation, deployment, or troubleshooting scenarios where clearing all saved wireless networks is required.
 .NOTES
     Author:    Jason W. Garel
-    Version:   1.0.0
+    Version:   1.0.1
     Created :  05-20-25
-    Modified : 05-20-25
-    Change Log:
-        05-20-25 - JWG - Created
+    Modified : 05-29-25
     Dependencies: Write-Log.psm1
 .OUTPUTS
     Returns 1 for critical errors, 0 for success
@@ -25,33 +23,35 @@
 #>
 
 #region --={ Initialization }=--
-$LogFile = "C:\Temp\Logs\WiFi-Amnesia.log"
 Import-Module "..\Include\Write-Log.psm1" # Allow logging via Write-Log
 Import-Module "..\Include\AppHandling.psm1" #Needed for Initialize-Service
+$LogFile    = "C:\Temp\Logs\WiFi-Amnesia.log"
 $ErrorLevel = 0
-Write-Host "Log file: $LogFile" # This is to make PSSA stop complaining about the $LogFile not being set
-Write-Log "--=( Starting WiFi Amnesia Script )=--" "Start!"
+Write-Host    "The log file is located at $LogFile"
+Write-Log     "--=( Starting WiFi Amnesia Script )=--" "Start!"
 #endregion
 
 #region --={ Main Loop }=--
-try {
-    $InitSvc = Initialize-Service wlansvc
-    if ($InitSvc) {
-        try { $Profiles = netsh wlan show profiles }
-        catch { Write-Log "Error calling netsh to show profiles '$($_.Exception.Message)'"}}
-    else { Write-Log "Unable to start required service, wlansvc. Exiting." "ERROR!"; $ErrorLevel = 1 }}
-catch { Write-Log "Error at start of main loop: $($_.Exception.Message)" "Error!" }
+Write-Log "Checking for required service, wlansvc." "-Serv-"
+try   { $InitSvc = Initialize-Service wlansvc }
+catch { Write-Log "Error with initializing service wlansvc $($_.Exception.Message)" "ERROR!"; EXIT 1 }
+if    (!$InitSvc) { Write-Log "Unable to start required service, wlansvc. Exiting." "ERROR!"; EXIT 1 }
 
-# Log all known networks
-if ($Profiles) { 
-    Write-Log "Found $($Profiles.Count) WiFi Profiles"
-    foreach ($Profile in $Profiles) { Write-Log "$Profile" "-NETSH-"}}
-else { Write-Log "No networks found at all. Sus."; $ErrorLevel = 1 }
+Write-Log "Service wlansvc is running, fetching WiFi profiles." "Net-SH"
+try   { $Profiles = netsh wlan show profiles }
+catch { Write-Log "Error calling netsh to show profiles: '$($_.Exception.Message)'" "ERROR!"; EXIT 1 }
+if    (!$Profiles) { Write-Log "No WiFi networks found at all. Exiting script now." "ERROR!"; EXIT 1 }
+if    ($LASTEXITCODE -ne 0) { Write-Log "NetSH Fail with exit code: $LASTEXITCODE." "ERROR!"; EXIT 1 }
 
-# Delete all known networks (Except main, which does not allow you to delete it this way)
-try { $Result = netsh wlan delete profile * }
-catch { Write-Log "Error deleting profiles: $($_.Exception.Message)" "ERROR!"; $ErrorLevel = 1 }
-if (!$Result) { Write-Log "Error deleting profiles, netsh returned null." "ERROR"; $ErrorLevel = 1 }
-Write-Log "--=( Finished WiFi Amnesia Script )=--" "-END!"
+Write-Log "Found $($Profiles.Count) WiFi profiles... " "-WiFi-"
+foreach ($Profile in $Profiles) { Write-Log "$Profile" "-WiFi-"}
+
+Write-Log "Deleting all WiFi profiles using netsh." "Net-SH"
+try   { $Result = netsh wlan delete profile * }
+catch { Write-Log "Failure, NetSh terminated with $($_.Exception.Message)" "ERROR!"; $ErrorLevel = 1 }
+if    (!$Result) { Write-Log "Failure deleting profiles null var returned" "ERROR!"; $ErrorLevel = 1 }
+if    ($LASTEXITCODE -ne 0) { Write-Log "NetSH cmd returned this exit code: $LASTEXITCODE." "-Note-" }
+
+Write-Log "--=( Finished WiFi Amnesia Script )=--" "-End!-"
 EXIT $ErrorLevel
 #endregion

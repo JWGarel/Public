@@ -11,11 +11,11 @@
     Call the Altiris Restart function before running this script, and keep the user logged out.
 .NOTES
     Author:    Jason W. Garel
-    Version:   1.0.0
+    Version:   0.0.0 # Untested and not ready for production use
     Created :  05-22-25
     Modified : 05-22-25
     Change Log:
-        05-22-25 - JWG - Created
+        05-22-25 -JwG- Created
     Dependencies: Write-Log.psm1, UserRegistry.psm1
 .PARAMETER SkipBackup
     Set to skip backing up all user profiles before deleting them

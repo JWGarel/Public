@@ -10,8 +10,6 @@
     Version:   0.0.1
     Created :  05-09-25
     Modified : 05-22-25
-    Change Log:
-        05-22-25 - JWG - Rewrote Get-UserProfiles, added Get-LoggedInSessions
     Requirements: PowerShell v3.0 or later
     Dependencies: Write-Log and Push-RegK
 .FUNCTIONALITY
@@ -88,7 +86,7 @@ function Mount-UserRegistryHives {
     try {
         foreach ($Profile in $ProfileList) {
             if ($Profile.SID -in $UnloadedHives.SID) {
-                reg load HKU\$($Profile.SID) $($Profile.UserHive) | Out-Null }}
+                $null = reg load HKU\$($Profile.SID) $($Profile.UserHive) }}
                 Write-Log "All $($UnloadedHives.Count) hives loaded" "Load-AH"
                 return $UnloadedHives }
     catch { Write-Log "Error loading hives! $($_.Exception.Message)" "ERROR!"; return $false }} # Returns an array of the previously UNLOADED hives (format: SID UserHive, Username
@@ -143,7 +141,7 @@ try {
         if (Test-Path -Path $HiveFullPath) {
             [gc]::collect()
             [gc]::WaitForPendingFinalizers()
-            reg unload "$HiveFullPath" | Out-Null     
+            $null = reg unload "$HiveFullPath"     
             Write-Log "Hive '$HiveFullPath' unloaded."
             ClearHive $HiveFullPath }}}        
 catch { Write-Log "Error unloading hive for '$UserSID': $($_.Exception.Message)" "ERROR!" ; return 1 }

@@ -1,5 +1,7 @@
 ﻿#powershell
 # Uninstall Only Adobe Reader (Not Pro)
+#Requires -RunAsAdministrator
+#Requires -Version 3.0
 <# 
 .SYNOPSIS
     Uninstall Only Adobe Reader (Not Pro)
@@ -15,30 +17,25 @@
         While Pro stayed carefree,
             A selective uninstaller, indeed!
 .NOTES
-    Author:   Jason W. Garel
-    Version:  1.0.4
-    Created:  03-14-25
-    Modified: 05-05-25
-    Change Log:
-        05-05-25 - JWG - Cleaned up formatting.
-        04-29-25 - JWG - Switched from old Log-Message to new Write-Log script. Added more try/catch loops and errorlevel returns.
-    Requires: PowerShell v3.0 or later
-    Permissions: Admin rights
+    Author:    Jason W. Garel
+    Version:   1.0.4
+    Created :  03-14-25
+    Modified : 05-05-25
     Dependencies: Write-Log.psm1
 .OUTPUTS
     Returns 0 for lack of critical errors, 1 for critical failure.
 #>
 
-$LogFile = "C:\Temp\Logs\AdobeReader-Uninstall.log"                            # Path to log file
-$SCAKey = "HKLM:\SOFTWARE\Adobe\Adobe Acrobat\DC\Installer"                    # Current SCA key location 4-29-25
-Import-Module "..\Include\Write-Log.psm1"     # Allow logging via Write-Log function
 
-Write-Host "Log file: $LogFile" # This is to make PSSA stop complaining about the $LogFile not being set
-Write-Log  "--=( Adobe Reader Uninstall Script started )=--" "Start!"
+Import-Module "..\Include\Write-Log.psm1"  # Allow logging via Write-Log function
+$LogFile    = "C:\Temp\Logs\AdobeReader-Uninstall.log"                      # Path to log file
+$SCAKey     = "HKLM:\SOFTWARE\Adobe\Adobe Acrobat\DC\Installer"             # Current SCA key location 4-29-25
+Write-Host    "Log file is located at $LogFile" 
+Write-Log     "--=( Adobe Reader Uninstall Script started )=--" "Start!"
 
 # Find all installed packages that look readerish. 
 try { $AcrobatPackages = Get-Package -Name "Adobe Acrobat*" -ErrorAction SilentlyContinue }
-catch { Write-Log "Critical error with Get-Package: $($_.Exception.Message)" "ERROR!"; return 1 }
+catch { Write-Log "Critical error with Get-Package: $($_.Exception.Message)" "ERROR!"; EXIT 1 }
 
 try { # Process all installed packages that met previous criteria
     if ($AcrobatPackages) {
@@ -66,11 +63,11 @@ try { # Process all installed packages that met previous criteria
             else { Write-Log "SCAPackageLevel Key not found in $SCAKey" "-Warn-" }}
         else { Write-Log "No known Adobe Reader packages identified" }}}
     else { Write-Log "No Adobe packages found." }}
-catch { Write-Log "Critical error with uninstall operation! $($_.Exception.Message)" "ERROR!"; return 1 }
+catch { Write-Log "Critical error with uninstall operation! $($_.Exception.Message)" "ERROR!"; EXIT 1 }
 
 # Find all still installed packages that look readerish. Again.
 try { $readerPackagesFinalCheck = Get-Package -Name "Adobe Acrobat*" -ErrorAction SilentlyContinue }
-catch { Write-Log "Critical error with Get-Package for final check: $($_.Exception.Message)" "ERROR!"; return 1 }
+catch { Write-Log "Critical error with Get-Package for final check: $($_.Exception.Message)" "ERROR!"; EXIT 1 }
 
 try { # Verification step: Process all still installed packages that met previous criteria to see what the deal is.
     if ($readerPackagesFinalCheck) {
@@ -83,7 +80,7 @@ try { # Verification step: Process all still installed packages that met previou
                 else { Write-Log  "$($package.Name) is likely Adobe Acrobat Pro or another non-reader version." }}
             else { Write-Log  "$($package.Name) is not a version of Adobe Reader this script explicitly checks for." "-Warn-" }}}
     else { Write-Log  "Final check for Acrobat Reader did not find it listed under installed apps." }}
-catch { Write-Log "Critical error with final check: $($_.Exception.Message)" "ERROR!"; return 1 }
+catch { Write-Log "Critical error with final check: $($_.Exception.Message)" "ERROR!"; EXIT 1 }
 finally { Write-Log  "--=( Adobe Reader Uninstall Script Completed )=--" "-END!-" }
 
-return 0
+EXIT 0

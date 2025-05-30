@@ -37,7 +37,7 @@
 function Initialize-Spooler {
     # Check if the Print Spooler service is running
     try {
-        $SpoolerStatus = $null # This will hold the spooler's service status
+        $null = $SpoolerStatus # This will hold the spooler's service status
         Write-Log "Checking Print Spooler service status..." "Spool!"
         $SpoolerStatus = (Get-Service -Name Spooler -ErrorAction SilentlyContinue).Status }
     catch { Write-Log "Error getting Print Spooler service status: $($_.Exception.Message)" "ERROR!" }
@@ -83,6 +83,14 @@ function Find-NetworkPrinterList {
         else { return @() }} # No printers found
     catch { Write-Log "Error loading Network printers: $($_.Exception.Message)" "ERROR!" }}
 
+function Find-InstalledPrinter {
+    param([Parameter(Mandatory=$true, HelpMessage="Full printer path as \\server\printername")][ValidateNotNullOrEmpty()][string]$PrinterPath)
+
+    $PrinterList = Find-NetworkPrinterList
+    if (!$PrinterList -or $PrinterList.Count -eq 0) { Write-Log "No per-machine shared network printer connections found at all."; return $false }
+    if ($PrinterList -contains $PrinterPath) { Write-Log "Found '$PrinterPath' in printer list"; return $true }
+    else { Write-Log "Printer '$PrinterPath' not found in printer list. Nothing to uninstall."; return $false }}
+
 function Remove-NetworkPrinter {
     param([Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()][string]$Printer)
     try {
@@ -111,7 +119,8 @@ $FunctionsToExport = @(
     'Initialize-Spooler',      # Checks and starts the Print Spooler service if not running.
     'Find-IPPrinterList',      # Lists all IP printers installed on the system.
     'Find-NetworkPrinterList', # Finds network printers from the specified registry key.
-    'Remove-NetworkPrinter'    # Deletes a specified network (named or IP) printer using the PrintUIEntry command.
+    'Remove-NetworkPrinter',   # Deletes a specified network (named or IP) printer using the PrintUIEntry command.
+    'Find-InstalledPrinter'    # Finds a specific installed printer
 )
 
 Export-ModuleMember -Function $FunctionsToExport

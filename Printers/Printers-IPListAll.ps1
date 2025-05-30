@@ -9,19 +9,9 @@
     Records each one to a log file. Does not record any other kind of printer (such as per user or shared network printers)
 .NOTES
     Author:    Jason W. Garel
-    Version:   1.0.5
+    Version:   1.0.6
     Created :  03-03-25
-    Modified : 05-22-25
-    Change Log:
-        05-22-25 - JWG - Added no printers found line and .COMPONENT section.
-        05-19-25 - JWG - Updated error handling and logging. Changed final "return" to "exit" to ensure proper exit behavior with Altiris.
-                          Exported functions to Include/PrinterHandling.psm1
-        05-09-25 - JWG - Finished formatting cleanup, added regions, added ErrorAction, changed Verify-Spooler to Intitialize-Spooler
-        05-04-25 - JWG - Revised some error logging and cleaned up formatting
-        04-29-25 - JWG - Switched from old Log-Message to new Write-Log script. Added more try/catch loops.
-                          Fixed printer count error by adding missing $($IPPrinters.Count)
-        04-22-25 - JWG - Added this improved comment block to better follow standard PowerShell commenting procedure.
-        04-08-25 - JWG - Updated Log-Message to use \logs directory. Restructured script into modular functions.
+    Modified : 05-29-25
     Dependencies: Write-Log.psm1 and PrinterHandling.psm1
 .OUTPUTS
     Returns 1 for critical errors, otherwise 0
@@ -33,21 +23,23 @@
 #>
 
 #region --={ Initialization }=--
-$LogFile = "C:\Temp\Logs\Printers-IPListAll.log"
 Import-Module "..\Include\Write-Log.psm1" # Allow logging via Write-Log
 Import-Module "..\Include\PrinterHandling.psm1" # Printer handling functions
+$LogFile    = "C:\Temp\Logs\Printers-IPListAll.log"
 $ErrorLevel = 0
-Write-Host "Log file: $LogFile" # This is to make PSSA stop complaining about the $LogFile not being set
-Write-Log "--=( Starting IP Printer Listing Script )=--" "Start!"
+Write-Host    "The logfile is located at $LogFile"
 #endregion
 
 #region --={ Main Loop }=--
-try {
-    Initialize-Spooler | Out-Null
-    Write-Log "----------------------------" "------"
-    $Found = Find-IPPrinterList
-    if (!$Found) { Write-Log "----------------------------" "------" }}
-catch { Write-Log "Critical error in main loop: $($_.Exception.Message)" "ERROR!"; $ErrorLevel = 1 }
+Write-Log     "--=( Starting IP Printer Listing Script )=--" "Start!"
+try   { $null = Initialize-Spooler }
+catch { Write-Log "Critical error in Initializing Spooler!  $($_.Exception.Message)" "ERROR!"; $ErrorLevel = 1 }
+
+Write-Log "----------------------------" "------"
+try   { $Found = Find-IPPrinterList }
+catch { Write-Log "Critical error while finding IP printers $($_.Exception.Message)" "ERROR!"; $ErrorLevel = 1 }
+
+if (!$Found) { Write-Log "----------------------------" "------" }
 
 Write-Log "--=( Finished IP Printer Listing Script )=--" "-END!"
 EXIT $ErrorLevel

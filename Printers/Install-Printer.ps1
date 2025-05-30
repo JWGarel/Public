@@ -18,10 +18,6 @@
     Version:   1.0.1
     Created :  05-16-25
     Modified : 05-19-25
-    Change Log:
-        1.0.1 - Updated error handling and logging. Changed final "return" to "exit" to ensure proper exit behavior with Altiris.
-                Exported Find-NetworkPrinterList and Initialize-Spooler to PrinterHandling module for easier reuse.
-        1.0.0 - Initial version
     Dependencies: Write-Log.psm1 and PrinterHandling.psm1 modules
 .INPUTS
     Requires the full printer path to be passed in as a parameter.
@@ -36,18 +32,18 @@
 param ([Parameter(Mandatory=$true, HelpMessage="Full printer path as \\server\printername")][ValidateNotNullOrEmpty()][string]$PrinterPath)
 Import-Module "..\Include\Write-Log.psm1"
 Import-Module "..\Include\PrinterHandling.psm1"
-$LogFile = "C:\Temp\Logs\Install-Printer.log"
+$LogFile    = "C:\Temp\Logs\Install-Printer.log"
+Write-Host    "Log file is '$LogFile'" # This is to make PSSA stop complaining about the $LogFile not being set
+Write-Log     "--=( Starting Network Printer Install Script )=--" "Start!"
+$ExitCode   = 0
 #endregion --={ Initialization }=--
 
 #region --={ Main Loop }=--
-Write-Host "Log file is '$LogFile'" # This is to make PSSA stop complaining about the $LogFile not being set
-Write-Log "--=( Starting Network Printer Install Script )=--" "Start!"
-$ExitCode = 0
 #Check if path is a valid UNC Path
 $PrinterPath = $PrinterPath.Trim() # Remove leading or trailing whitespace
 $IsPathValid = $PrinterPath -match '^\\\\[^\\]+\\[^\\]+$'
 if (!$IsPathValid) { Write-Log "Invalid printer path: '$PrinterPath' - Path must be in the format of \\server\printername." "ERROR!"; EXIT 1 }
-Initialize-Spooler | Out-Null
+$null = Initialize-Spooler
 
 #region --={ Check to see if the printer is already installed }=--
 try {
@@ -95,7 +91,7 @@ catch { Write-Log "Critical error checking if printer was installed: $($_.Except
 #region --={ Restart the spooler service }=--
 try {
     Write-Log "Restarting Print Spooler service..." "SPOOL!"
-    Restart-Service -Name Spooler -Force -ErrorAction SilentlyContinue | Out-Null
+    $null = Restart-Service -Name Spooler -Force -ErrorAction SilentlyContinue
     Write-Log "Print Spooler service restarted" "SPOOL!"}
 catch { Write-Log "Failed to restart Print Spooler service: $($_.Exception.Message)" "ERROR!" }
 finally { Write-Log "--=( Finished Network Printer Install Script )=--" "-End!-" }

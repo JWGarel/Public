@@ -19,12 +19,6 @@
     Version:   1.0.3
     Created :  04-04-25
     Modified : 05-20-25
-    Change Log:
-        05-20-25 - JWG - Changed final return 0 for EXIT $ErrorLevel
-        05-05-25 - JWG - Cleaned up formatting.
-        04-29-25 - JWG - Switched from old Log-Message to new Write-Log script. Added more try/catch loops and errorlevel returns.
-        04-22-25 - JWG - Added this improved comment block to better follow standard PowerShell commenting procedure. Revised "EDIT THIS" block to change logfile name.
-        04-08-25 - JWG - Updated Write-Log to use \logs directory.
     Dependencies: Write-Log.psm1
 .OUTPUTS
     Returns 0 for lack of critical errors, 1 for critical failure.
@@ -47,7 +41,7 @@ $LogPath = "C:\Temp\Logs\"                                               # Chang
 $LogFile = Join-Path $LogPath $LogFileName                                  # Create the full path to the log file
 Write-Host "Log file: $LogFile"                                               # This is to make PSSA stop complaining about the $LogFile not being set
 $SoftwareStore = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*"  # Show me where the uninstall strings are kept
-Import-Module "..\Include\Write-Log.psm1"                                         # Allow logging via Write-Log function
+Import-Module "..\Include\Write-Log.psm1"        # Allow logging via Write-Log function
 
 # MAIN { ------------------------------------------
 $ErrorLevel = 0
@@ -63,7 +57,7 @@ if ($UninstallString) {
     for ($Retry = 1; $Retry -le $MaxRetries; $Retry++) {
         try {
             Write-Log "Attempting to uninstall (Attempt $Retry of $MaxRetries)."
-            Start-Process -FilePath $UninstallString -ArgumentList "$ApplicationSilentSwitch" -Wait -PassThru | Out-Null
+            $null = Start-Process -FilePath $UninstallString -ArgumentList "$ApplicationSilentSwitch" -Wait -PassThru
             Write-Log "Uninstall process started, waiting $RetryDelaySeconds for uninstall to complete"
             Start-Sleep -Seconds $RetryDelaySeconds
             if (-not (Get-ItemProperty $SoftwareStore | Where-Object {$_.DisplayName -like $ApplicationDisplayName})) {

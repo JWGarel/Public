@@ -15,7 +15,7 @@
     Created :  05-20-25
     Modified : 05-20-25
     Change Log:
-        05-20-25 - JWG - Created.
+        05-20-25 -JwG- Created.
     Requires:
         - The functions that use Get-Printer need PowerShell 3.0 or later
         - Admin rights to manage printers and services

@@ -13,9 +13,6 @@
     Version:   1.0.2
     Created :  05-08-25
     Modified : 05-20-25
-    Change Log:
-        05-20-25 - JWG - Minor bugfixes (logging arrays), cleanup, and moved Initialize-Service to AppHandling.psm1
-        05-09-25 - JWG - Cleaned up formatting, added -ErrorAction and regions, changed function verbs.
     Dependencies: Write-Log.psm1 (for logging) and AppHandling.psm1 (for Initialize-Service)
 .OUTPUTS
     Returns 0 for lack of critical errors and 1 for critical failure.
@@ -29,7 +26,7 @@ Import-Module "..\Include\Write-Log.psm1"
 Import-Module "..\Include\AppHandling.psm1"
 #region --={ Config Area }=---------------=-=#
 $LogFile = "C:\Temp\Logs\NTS-TimeSync.log" # Log file location
-$TimeServer = "8.8.8.8"                  # Pick a time server
+$TimeServer = "8.8.8.8"                  # A time server
 $AlsSwitches   = @(                    # Command from Al's script to change NTS from domain server to our internal one
     "/configure", "/update",         #
     "/manualpeerlist:$TimeServer", #
@@ -39,7 +36,7 @@ $AlsSwitches   = @(                    # Command from Al's script to change NTS 
 function Set-W32Time {
     param ([Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()][string[]]$Switches)
     try {
-        $ConfigureOutput=$null;$ConfigureOutput2=$null;$RestartOutput=$null
+        $null=$ConfigureOutput;$null=$ConfigureOutput2;$null=$RestartOutput
         $ConfigureOutput = W32tm @($Switches)
         Write-Log "W32Time result: $ConfigureOutput" }
     catch {
@@ -52,7 +49,7 @@ function Set-W32Time {
 
 function Restart-W32Time {
     try {
-        $RestartOutput2=$null;$ResyncOutput=$null
+        $null=$RestartOutput2;$null=$ResyncOutput
         Write-Log "Restarting W32Time service to apply changes..."
         $RestartOutput2 = Restart-Service w32time -ErrorAction Stop
         Write-Log "Restart complete, forcing an immediate resyncing now. Restart result: $RestartOutput2"

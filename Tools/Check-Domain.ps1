@@ -13,8 +13,6 @@
     Version:   1.0.2
     Created :  05-08-25
     Modified : 05-09-25
-    Change Log:
-        05-09-25 - JWG - Cleaned up formatting, added regions, added ErrorActions
 .OUTPUTS
     0 returns if on domain.
     1 for off domain.
@@ -24,7 +22,7 @@
 #region --={ Config Area }=-------------------=-=#
 $EnableLogging = $false                       # Turn this to true if you want to make a log file
 $LogFile = "C:\Temp\Logs\Check-Domain.log" # Where the log file saved, if logging is enabled
-$DomainServer = "EXAMPLE.ORG"           # Set this to the domain server to check
+$DomainServer = "MCPSMD.ORG"            # Set this to the domain server to check
 #endregion --------------------------#
 
 #region --={ Functions }=--=#
@@ -74,14 +72,14 @@ try {
     Write-Log "--=( Starting Domain Check Script. )=--" "Start!"
 
     try { 
-        $DomainResult = $null
+        $null = $DomainResult
         # This test sometimes returns true if it hasn't tried and failed yet, or if the domain was never joined
         $DomainResult = Test-ComputerSecureChannel -ErrorAction SilentlyContinue 
         Write-Log "First check complete, result: $DomainResult" }
     catch { Write-Log "Error processing first secure channel test. $($_.Exception.Message)"; EXIT 2 }
 
     if ($DomainResult) {
-        $OnDomain = $null
+        $null = $OnDomain
         # This test is likely more accurate
         $OnDomain = Test-ComputerSecureChannel -Server $DomainServer -ErrorAction SilentlyContinue
         Write-Log "Second check complete, result: $OnDomain"
@@ -91,5 +89,5 @@ catch { Write-Log "Error second secure channel test. $($_.Exception.Message)" "-
 finally {
     # This runs even though exit codes are already passed. Neat!
     Write-Log "--=( Completed Domain Check Script )=--" "-End!-"
-    Set-ExecutionPolicy Restricted -ErrorAction SilentlyContinue }
+    $null = Set-ExecutionPolicy Restricted -ErrorAction SilentlyContinue }
 #endregion
